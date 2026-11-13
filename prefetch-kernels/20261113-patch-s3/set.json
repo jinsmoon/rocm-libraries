@@ -1,0 +1,158 @@
+{
+  "set": "20261113-patch-s3",
+  "source_head": "eb9b307c4d56d5df63bd3bc60603d33aaa3abbc5",
+  "binding_sha256": "389cd6f71e303729cd61d77e73a195d8e6eefa3f534c65c2f256b7195e8cf891",
+  "host_assembler": "AMD clang version 24.0.0git (https://github.com/ROCm/llvm-project.git 36c1564ff815158e4fdff0880ba90b5d628aa045)",
+  "repeats": 3,
+  "cases": [
+    {
+      "case": "mxf4_tn_maf",
+      "kernel": "Cijk_Alik_Bljk_F4F8S_MXAE8B32_MXBE8B32_BH_UserArgs_MT256x256x512_MI32x16x1_SN_LDSB0_AFC0_AG0_AGGSUA0_AGNTAB0_AFEM2_AFEM2_ASEM32_BL1_BS1_CAIDMn2_CD4_4_CLR0_CLS0_CADS0_DTLA0_DTLB0_DTLM0_DTVA0_DTVB0_DTVMXSA0_DTVMXSB0_DTVSM0_DPLB0_EPS0_ELFLR0_EMLLn1_FDSI1_GRPM1_GRVWA2_GRVWB2_GSUAMB_GLS0_HPLR1_ISA1250_ICIW1_IU1_IA0_K1_LDSSI1_LDSTI0_LBSPPA2048_LBSPPB1024_LBSPPMXSA256_LBSPPMXSB0_LBSPPM0_LPA32_LPB32_LPMXSA16_LPMXSB0_LPMn1_LRVWn1_LWPMn1_MIAV1_MIWT8_4_MXLITDM_MXSFIMS_MO64_MGRIPM1_NTn1_NTA0_NTB0_NTC0_NTD0_NTE0_NTG0_NTMXSA0_NTMXSB0_NTM0_NTWS0_NVn1_NVA0_NVB0_NVC0_NVD0_NVE0_NVG0_NVMXSA0_NVMXSB0_NVM0_NVWS0_NEPBS0_NLCA1_NLCB1_ONLL1_PAP0_PGL2_PGR2_PLR1_PKA1_RAP0_SGROB0_SIA4_SS1_SPO0_SRVW0_SSO0_SVW8_SNLL1_SIP1_SGRO0_TDMI3_TDMIM1_TDMLWS0_TDMPLB0_TDMS0_TIN0_THn1_THA0_THB0_THC0_THD0_THE0_THG0_THMXSA0_THMXSB0_THM0_THWS0_TPSN_TLDS1_TLDSMn1_ULSGRO0_USL1_USLMX0_UDFMAC0_UIOFGRO0_UPLRP0_USFGRO0_USI0_VSn1_VWA8_VWB4_WSGRA0_WSGRB0_WS32_WG64_2_1_WGMXCC1",
+      "ref": "base",
+      "exp": [
+        "p-mx-k8",
+        "p-mx-w10",
+        "p-mx-w15",
+        "p-mx-w30",
+        "p-mx-w38",
+        "lead8"
+      ],
+      "order": [
+        "base",
+        "p-mx-k8",
+        "base",
+        "p-mx-w10",
+        "base",
+        "p-mx-w15",
+        "base",
+        "p-mx-w30",
+        "base",
+        "p-mx-w38",
+        "base",
+        "lead8",
+        "base"
+      ],
+      "built_from": {
+        "base": "base",
+        "p-mx-k8": "base",
+        "p-mx-w10": "base",
+        "p-mx-w15": "base",
+        "p-mx-w30": "base",
+        "p-mx-w38": "base",
+        "lead8": "lead8"
+      },
+      "sha256": {
+        "base": "a971bf5e1ee42b71c064be8f9f92a6fe84751d0a1fd960a4edcc1e3f89f987a5",
+        "p-mx-k8": "84bd02e50dd22b23eef72da63d6b1872013f0528abf86c4ad2510d14ed413fea",
+        "p-mx-w10": "020e53596fffcbdbfb5781040e2bd99aeb95285ff4137f0ce515b733682925b9",
+        "p-mx-w15": "e21bc7fba111859a4b7ebffed841347adfe7210e37ce9a0e82f3bd63d5814982",
+        "p-mx-w30": "6454274467c6d583f297b21e4d1608d2dc9f0256a6b7ca53be09e6c1214d264d",
+        "p-mx-w38": "f1a31a7798857711079646f0ba7d82aaabdc799e327e731e0692e0238974eba2",
+        "lead8": "b160584d5048800ef949a44ca5217ad08adc75569739b39a0369bf851bee1ff0"
+      }
+    },
+    {
+      "case": "bbs_tn_medium",
+      "kernel": "Cijk_Alik_Bljk_BBS_BH_UserArgs_MT128x128x128_MI16x16x1_SN_LDSB0_AFC0_AG0_AGGSUA0_AGNTAB0_AFEM1_AFEM1_ASEM1_BL1_BS1_CD4_4_CLR0_CLS0_CADS0_DTLA0_DTLB0_DTLM0_DTVA0_DTVB0_DTVMXSA0_DTVMXSB0_DTVSM0_DPLB0_EPS0_ELFLR0_EMLLn1_FDSI1_GRPM1_GRVWA1_GRVWB1_GSUAMB_GLS0_HPLR0_ISA1250_ICIW1_IU1_IA0_K1_LDSSI1_LDSTI0_LBSPPA1024_LBSPPB1024_LBSPPMXSA0_LBSPPMXSB0_LBSPPM0_LPA8_LPB8_LPMXSA0_LPMXSB0_LPMn1_LRVWn1_LWPMn1_MIAV1_MIWT4_4_MXLITDM_MXSFIMS_MO64_MGRIPM1_NTn1_NTA0_NTB0_NTC0_NTD0_NTE0_NTG0_NTMXSA0_NTMXSB0_NTM0_NTWS0_NVn1_NVA0_NVB0_NVC0_NVD0_NVE0_NVG0_NVMXSA0_NVMXSB0_NVM0_NVWS0_NEPBS0_NLCA1_NLCB1_ONLL1_PAP0_PGL2_PGR2_PLR1_PKA1_RAP0_SGROB0_SIA4_SS1_SPO0_SRVW0_SSO0_SVW4_SNLL0_SIP1_SGRO0_TDMI3_TDMIM0_TDMLWS0_TDMPLB0_TDMS0_TIN0_THn1_THA0_THB0_THC0_THD0_THE0_THG0_THMXSA0_THMXSB0_THM0_THWS0_TPSN_TLDS1_TLDSMn1_ULSGRO0_USL1_USLMX0_UDFMAC0_UIOFGRO0_UPLRP0_USFGRO0_USI0_VSn1_VWA4_VWB4_WSGRA0_WSGRB0_WS32_WG32_4_1_WGMXCC1",
+      "ref": "base",
+      "exp": [
+        "p-bm-k16",
+        "p-bm-w9",
+        "p-bm-w13",
+        "p-bm-w17",
+        "p-bm-w26",
+        "lead16"
+      ],
+      "order": [
+        "base",
+        "p-bm-k16",
+        "base",
+        "p-bm-w9",
+        "base",
+        "p-bm-w13",
+        "base",
+        "p-bm-w17",
+        "base",
+        "p-bm-w26",
+        "base",
+        "lead16",
+        "base"
+      ],
+      "built_from": {
+        "base": "base",
+        "p-bm-k16": "base",
+        "p-bm-w9": "base",
+        "p-bm-w13": "base",
+        "p-bm-w17": "base",
+        "p-bm-w26": "base",
+        "lead16": "lead16"
+      },
+      "sha256": {
+        "base": "2b1016c4d594e6f719886864c5ffe88c3814f29f2c0bc921890376642bd2e912",
+        "p-bm-k16": "217f17f34002f0c1eec2072d6e44d6a8687ac94d0050811733460e986a8a692f",
+        "p-bm-w9": "ac85573f512580ae1b61362550bac8f337f68616980521381abf58861fa3e078",
+        "p-bm-w13": "c27f74b7063a8296e0e549d51202f9df4f92d677be406915faa193da7f37679a",
+        "p-bm-w17": "26ab30fe0a02242e800ed7f4df7f5ea25485bc4a1921de36757c59ac26dbaa4e",
+        "p-bm-w26": "f1e44e41631555e503318a97680e64e9632179c61c0524034e613509e285d165",
+        "lead16": "a7570e579b0937de45fe76fc5174784ab08ee53bd902d7c0ab3f58afb4d9b4a8"
+      }
+    },
+    {
+      "case": "f8_tn_maf",
+      "kernel": "Cijk_Alik_Bljk_F8F8S_BH_UserArgs_MT256x256x256_MI16x16x1_SN_LDSB0_AFC0_AG0_AGGSUA0_AGNTAB0_AFEM8_AFEM1_ASEM1_BL1_BS1_CAIDMn2_CD4_4_CLR0_CLS0_CADS0_DTLA0_DTLB0_DTLM0_DTVA0_DTVB0_DTVMXSA0_DTVMXSB0_DTVSM0_DPLB0_EPS0_ELFLR0_EMLLn1_FDSI1_GRPM1_GRVWA1_GRVWB1_GSUAMB_GLS1_HPLR1_ISA1250_ICIW1_IU1_IA2_K1_LDSSBR1_LDSSI1_LDSTI0_LBSPPA2048_LBSPPB1024_LBSPPMXSA0_LBSPPMXSB0_LBSPPM0_LPA16_LPB16_LPMXSA0_LPMXSB0_LPMn1_LRVWn1_LWPMn1_MIAV1_MIWT8_8_MXLITDM_MXSFIMS_MO64_MGRIPM1_NTn1_NTA0_NTB0_NTC0_NTD0_NTE0_NTG0_NTMXSA0_NTMXSB0_NTM0_NTWS0_NVn1_NVA0_NVB0_NVC0_NVD0_NVE0_NVG0_NVMXSA0_NVMXSB0_NVM0_NVWS0_NEPBS16_NLCA1_NLCB1_ONLL1_PAP0_PGL2_PGR2_PLR1_PKA1_RAP0_SGROB0_SIA4_SS1_SPO0_SRVW0_SSO0_SVW8_SNLL1_SIP1_SGRO0_TDMI3_TDMIM1_TDMLWS0_TDMPLB0_TDMS0_TIN0_THn1_THA0_THB0_THC0_THD0_THE0_THG0_THMXSA0_THMXSB0_THM0_THWS0_TPSN_TLDS1_TLDSMn1_ULSGRO0_USL1_USLMX0_UDFMAC0_UIOFGRO0_UPLRP0_USFGRO0_USI0_VSn1_VWA8_VWB4_WSGRA0_WSGRB0_WS32_WG32_4_1_WGMXCC1",
+      "ref": "base",
+      "exp": [
+        "p-f8-k8",
+        "p-f8-k16",
+        "lead8"
+      ],
+      "order": [
+        "base",
+        "p-f8-k8",
+        "base",
+        "p-f8-k16",
+        "base",
+        "lead8",
+        "base"
+      ],
+      "built_from": {
+        "base": "base",
+        "p-f8-k8": "base",
+        "p-f8-k16": "base",
+        "lead8": "lead8"
+      },
+      "sha256": {
+        "base": "f889a402fd235cf57da071580c953355e6b7298601758bffee100d596e5e5eeb",
+        "p-f8-k8": "d537146853ad10318cd36f64b08c4d093d0ff5ae8fffc69f01eef5eca230f06f",
+        "p-f8-k16": "f70262a9bc79f60c62257a384c1f3ef4939fbcc8347fadda374936193917d9db",
+        "lead8": "07c7f1158f1a6527993b14cc1cb70d56e351e272073819b489faebae3509fbc0"
+      }
+    },
+    {
+      "case": "mxf4_tn_medium",
+      "kernel": "Cijk_Alik_Bljk_F4F8S_MXAE8B32_MXBE8B32_BH_UserArgs_MT128x128x1024_MI16x16x1_SN_LDSB0_AFC0_AG0_AGGSUA0_AGNTAB0_AFEM2_AFEM2_ASEM32_BL1_BS1_CD4_4_CLR0_CLS0_CADS0_DTLA0_DTLB0_DTLM0_DTVA0_DTVB0_DTVMXSA0_DTVMXSB0_DTVSM0_DPLB0_EPS0_ELFLR0_EMLLn1_FDSI1_GRPM1_GRVWA2_GRVWB2_GSUAMB_GLS0_HPLR0_ISA1250_ICIW1_IU1_IA0_K1_LDSSI0_LDSTI0_LBSPPA1024_LBSPPB1024_LBSPPMXSA0_LBSPPMXSB0_LBSPPM0_LPA32_LPB32_LPMXSA0_LPMXSB0_LPMn1_LRVWn1_LWPMn1_MIAV1_MIWT4_4_MXLITDM_MXSFIMS_MO64_MGRIPM1_NTn1_NTA0_NTB0_NTC0_NTD0_NTE0_NTG0_NTMXSA0_NTMXSB0_NTM0_NTWS0_NVn1_NVA0_NVB0_NVC0_NVD0_NVE0_NVG0_NVMXSA0_NVMXSB0_NVM0_NVWS0_NEPBS0_NLCA1_NLCB1_ONLL1_PAP0_PGL2_PGR2_PLR1_PKA1_RAP0_SGROB0_SIA4_SS1_SPO0_SRVW0_SSO0_SVW2_SNLL0_SIP1_SGRO0_TDMI3_TDMIM0_TDMLWS0_TDMPLB0_TDMS0_TIN0_THn1_THA0_THB0_THC0_THD0_THE0_THG0_THMXSA0_THMXSB0_THM0_THWS0_TPSN_TLDS1_TLDSMn1_ULSGRO0_USL1_USLMX0_UDFMAC0_UIOFGRO0_UPLRP0_USFGRO0_USI0_VSn1_VWA2_VWB2_WSGRA0_WSGRB0_WS32_WG32_4_1_WGMXCC1",
+      "ref": "base",
+      "exp": [
+        "p-mm-w12",
+        "p-mm-w20"
+      ],
+      "order": [
+        "base",
+        "p-mm-w12",
+        "base",
+        "p-mm-w20",
+        "base"
+      ],
+      "built_from": {
+        "base": "base",
+        "p-mm-w12": "base",
+        "p-mm-w20": "base"
+      },
+      "sha256": {
+        "base": "60d613ecab64971817c650f120b0b486ecf252437b082ac9c20b71ae7195a365",
+        "p-mm-w12": "31abb0718b6cb443431720f8322dd976d6af81202dd967152f19a5b7fc9f4aab",
+        "p-mm-w20": "aa2f17b51f7471f348298cc8cc84ce0aeef6b7b08fbec0d9a6d80d896a189a13"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "assemble": [
+    "{CXX}",
+    "-x",
+    "assembler",
+    "--target=amdgcn-amd-amdhsa",
+    "-mcode-object-version=4",
+    "-c",
+    "-Xclangas",
+    "-target-feature",
+    "-Xclangas",
+    "+real-true16",
+    "-mcpu=gfx1250",
+    "-mno-wavefrontsize64",
+    "{S}",
+    "-o",
+    "{O}"
+  ],
+  "link": [
+    "{CXX}",
+    "--target=amdgcn-amd-amdhsa",
+    "-Xlinker",
+    "--build-id=sha1",
+    "-Xlinker",
+    "--threads=1",
+    "{O}",
+    "-o",
+    "{CO}"
+  ]
+}
