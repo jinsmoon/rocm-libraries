@@ -181,6 +181,10 @@ struct PassFeatureConfig {
         /// group; below 8 marks a single-stage loop (whole group at the load's window,
         /// ahead of the stage barrier); 0 = off.
         int prefetchLeadWmmas = 0;
+        /// Mirrors ModuleOptions::PrefetchLeadCycles. When > 0 it replaces
+        /// prefetchLeadWmmas in blocks with WMMAs: the lead in windows is
+        /// ceil(cycles / the first WMMA's latency) - 2, at least 8 (StageWmmaCounter).
+        int prefetchLeadCycles = 0;
         /// Mirrors ModuleOptions::PrefetchLeadMinStageWmmas. A basic block whose stages
         /// (WMMAs / tensor_load groups) are shorter than this runs with no multi-stage
         /// prefetch lead (8 or more); a single-stage lead (below 8) is kept.

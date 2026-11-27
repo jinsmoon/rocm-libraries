@@ -134,8 +134,8 @@
     X(ArchName, std::string)                      \
     X(LowerViaLogicalIR, bool)
 
-// Scheduling knobs below default to -1 (= unset), except LockDsReadOrder,
-// EvenSpreadFillers, WaitAluHoldStrictCount, PrefetchLeadWmmas and PrefetchLeadMinStageWmmas,
+// Scheduling knobs below default to -1 (= unset), except LockDsReadOrder, EvenSpreadFillers,
+// WaitAluHoldStrictCount, PrefetchLeadWmmas, PrefetchLeadCycles and PrefetchLeadMinStageWmmas,
 // which have fixed defaults and
 // are not resolved by the heuristics. Gfx1250Backend resolves unset
 // knobs via SchedulingKnobHeuristics before DAG scheduling / cluster-barrier insertion (user value
@@ -149,6 +149,7 @@
     X(WaitAluHoldStrictCount, int, 2)     /* hold s_wait_alu count <= N to next barrier wait */    \
     X(WarGateWmmas, int, -1)              /* WMMA src -> ds_load overwrite gap; -1 = derived */    \
     X(PrefetchLeadWmmas, int, 25)         /* 0 = prefetch issues when ready */                     \
+    X(PrefetchLeadCycles, int, 0)         /* > 0: lead in cycles, replaces PrefetchLeadWmmas */    \
     X(PrefetchLeadMinStageWmmas, int, 64) /* shorter stages run with no lead */                    \
     X(DsSpread, bool, true)               /* even ds_load spread over the WMMAs */                 \
     X(DsBatchWmmas, int, 4)               /* WMMAs per ds_load pacing batch */                     \

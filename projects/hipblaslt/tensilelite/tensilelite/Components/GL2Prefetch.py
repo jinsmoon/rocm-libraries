@@ -90,6 +90,44 @@ class GL2PrefetchLoad(GL2Prefetch):
         tp["gl2nc"] = tp["gl2ncp"] * tp["gl2ncc"]
         tp["gl2nl"] = max(1, ceil(tp["gl2nc"] / numCooperativeThreads))
 
+    # Prefetch lead model for a multi-stage (HalfPLR) loop. A workgroup's GL2 prefetch requests
+    # (one per GlobalPrefetchSize chunk) leave through the same request path as the tensor_load
+    # that follows them. A tensor_load issued while prefetch chunks are still queued starts late
+    # by their drain time, and the wave waits for it at s_wait_tensorcnt. The lead is the time
+    # the group needs to drain before the load, plus a fixed margin.
+    # Both values were measured on one gfx1250 part; they are not hardware constants.
+    LEAD_CHUNKS_PER_CYCLE = 1   # request-path drain rate (microbenchmark: 1 chunk per cycle)
+    LEAD_MARGIN_CYCLES = 75     # fixed margin, kept so that every measured kernel stayed at least
+                                # as fast as the constant lead
+
+    @staticmethod
+    def chunksPerInst(kernel: Mapping, tp: Mapping) -> list:
+        """Prefetch chunks one workgroup issues, per instruction of tp.
+
+        Instruction i covers chunks [i * ncPerInst, (i + 1) * ncPerInst) of the cluster's
+        block (calculateStartAddr), shared evenly by the cluster's workgroups.
+        """
+        numCooperativeWGs: int = kernel["ClusterDim"][0] * kernel["ClusterDim"][1]
+        nc: int = tp["gl2nc"]
+        nl: int = tp["gl2nl"]
+        ncPerInst: int = ceil(nc / nl)
+        return [ceil(min(ncPerInst, nc - i * ncPerInst) / numCooperativeWGs) for i in range(nl)]
+
+    @classmethod
+    def leadCycles(cls, kernel: Mapping, tpList) -> int:
+        """Cycles the prefetch group of one tensor_load needs ahead of it (PrefetchLeadCycles).
+
+        The scheduler staggers the n prefetches over the lead in issue order (the j-th at
+        lead * (n - j) / n), so every suffix j of the group must drain in its share of it.
+        With the largest prefetches first the whole group (j = 0) binds.
+        """
+        chunks = [c for tp in tpList for c in cls.chunksPerInst(kernel, tp)]
+        n = len(chunks)
+        drain = 0.0
+        for j in range(n):
+            drain = max(drain, sum(chunks[j:]) / cls.LEAD_CHUNKS_PER_CYCLE * n / (n - j))
+        return ceil(drain + cls.LEAD_MARGIN_CYCLES)
+
     @staticmethod
     def numIncSgpr(kernel: Mapping) -> int:
         """Width of GL2PrefetchInc{tc}: 2 sgprs (64-bit) if PrefetchGL2Inc64Bit, else 1."""

@@ -2988,7 +2988,8 @@ void CDNA5ReadyQueue::onInit(IRList::iterator regionStart, IRList::iterator regi
         if (!formWmma_ && isMatrixInstruction(*inst)) formWmma_ = inst;
     }
     blockPrefetchLead_ =
-        stage.effectiveLead(feats.prefetchLeadWmmas, feats.prefetchLeadMinStageWmmas);
+        stage.effectiveLead(stage.requestedLead(feats.prefetchLeadWmmas, feats.prefetchLeadCycles),
+                            feats.prefetchLeadMinStageWmmas);
     waitAlu_ =
         feats.waitAluScoreboard || feats.waitAluHoldStrictCount >= 0
             ? std::make_unique<WaitAluTracker>(

@@ -1381,6 +1381,24 @@ TEST_F(DAGSchedulerPassTest, PrefetchLeadKeepsClearOfAnotherMovementsTensorLoad)
                          << scheduleOrder(*bb);
 }
 
+// PrefetchLeadCycles: windows of the block's first WMMA (after its operand-format override),
+// minus the 2-window placement offset, at least the single-stage threshold 8. Off (0) or a
+// block without WMMAs keeps PrefetchLeadWmmas.
+TEST_F(DAGSchedulerPassTest, PrefetchLeadCyclesUsesFirstWmmaLatency) {
+    dag::StageWmmaCounter f8;
+    f8.add(*createWmmaScaleF8(/*destStart=*/0, /*src0Start=*/100));
+    f8.add(*createWmmaScaleF4(/*destStart=*/8, /*src0Start=*/100));
+    dag::StageWmmaCounter f4;
+    f4.add(*createWmmaScaleF4(/*destStart=*/16, /*src0Start=*/100));
+    const dag::StageWmmaCounter none;
+
+    EXPECT_EQ(f8.requestedLead(25, 0), 25);
+    EXPECT_EQ(f8.requestedLead(25, 401), 49);  // ceil(401 / 8) - 2
+    EXPECT_EQ(f4.requestedLead(25, 401), 99);  // ceil(401 / 4) - 2
+    EXPECT_EQ(f8.requestedLead(25, 40), 8);    // ceil(40 / 8) - 2 = 3, kept multi-stage
+    EXPECT_EQ(none.requestedLead(25, 401), 25);
+}
+
 // Same overlap as above, with DsSpread on. The after barrier lands on the parent WMMA, so the
 // stage anchor must not put the dropped drain back. A restored drain would be the 24th WMMA.
 TEST_F(DAGSchedulerPassTest, StageAnchorLeavesOverlapParentFloorInPlace) {

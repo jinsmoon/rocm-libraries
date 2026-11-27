@@ -25,6 +25,13 @@ belongs with, so the rules below place it explicitly.
      first.
    - With a lead set, prefetches have their own ready queue; they are not fillers and never
      count against the filler quota.
+   - `PrefetchLeadCycles` gives the multi-stage lead in cycles instead (see "Lead from the
+     prefetch chunks" below). It becomes `ceil(cycles / c) - 2` windows, at least 8, where `c` is
+     the latency of the block's first WMMA after its operand-format override (8 for
+     `v_wmma_scale_f32_16x16x128_f8f6f4`, 4 for its FP4 x FP4 form). The 2 windows are the
+     distance the first prefetch lands beyond its lead (measured +2.0 to +2.8), because the stage
+     barrier's planned window stands in for the tensor_load's. Below 8 the scheduler would switch
+     to single-stage grouping, so the lead stays at 8 or more.
 2. **Wait-prone fillers** (`WaitAluHoldStrictCount`, only with ESM2, the only mode in which
    InsertWaitAlu runs). `WaitAluTracker` is InsertWaitAlu's
    own scoreboard (shared `stepInstruction()`, so the answers cannot diverge); `query(inst)`
@@ -59,7 +66,8 @@ is in [Scheduler tuning parameters](../user/scheduler-tuning-parameters.md). `st
 
 | ModuleOption | default | stinkytofu-opt flag | meaning |
 |---|---|---|---|
-| `PrefetchLeadWmmas` | 25 (KernelWriter: no HalfPLR 4; else 25 sub-byte A, 40 otherwise; a lead of 8 or more is dropped where a stage has < 64 WMMAs) | `--prefetch-lead-wmmas=N` | prefetch lead; < 8 = single-stage grouping; 0 = off |
+| `PrefetchLeadWmmas` | 25 (KernelWriter: no HalfPLR 4; else 25 sub-byte A, 30 otherwise; a lead of 8 or more is dropped where a stage has < 64 WMMAs) | `--prefetch-lead-wmmas=N` | prefetch lead; < 8 = single-stage grouping; 0 = off |
+| `PrefetchLeadCycles` | 0 (KernelWriter: the prefetch group's drain time with HalfPLR) | `--prefetch-lead-cycles=N` | > 0: the lead in cycles, replaces `PrefetchLeadWmmas` in blocks with WMMAs |
 | `WaitAluHoldStrictCount` | 2 | `--wait-alu-hold-strict-count=N` | strict-wait threshold; < 0 = no hold |
 | `DsSpread` | true | `--ds-spread` / `--no-ds-spread` | spread the region's ds_loads evenly over its WMMAs |
 | `EvenSpreadFillers` | true | – | filler quota per window |
@@ -101,7 +109,50 @@ Findings behind the rules:
 - Even spread helps the f4 MAF kernels (+1.5 vs off) and is neutral elsewhere once the
   critical chains are exempt.
 
+## Lead from the prefetch chunks (KernelWriter)
+
+With HalfPLR, KernelWriter sets `PrefetchLeadCycles` (`GL2PrefetchLoad.leadCycles`) from the GL2
+prefetches in front of one tensor_load.
+
+Why a lead is needed: each prefetch instruction sends one GL2 request per 256-byte chunk
+(`GlobalPrefetchSize`), and a workgroup's prefetch requests leave through the same request path
+as its tensor_load. A tensor_load issued while prefetch chunks are still queued starts late by the
+time they take to drain, and the wave waits for that tensor_load at `s_wait_tensorcnt`, so the
+delay becomes stall. The lead is how long before the tensor_load the prefetches must start so that
+they have drained by then, plus a margin.
+
+```
+cycles = max_j [ sum_{i>=j} C_i / r * n / (n - j) ] + M
+```
+
+- `C_i`: chunks one workgroup issues with the i-th of the n prefetch instructions, in issue order.
+  KernelWriter already counts the chunks of the cluster's prefetch block (`gl2nc`); the cluster's
+  workgroups share them evenly.
+- `r = 1` chunk per cycle: how fast the request path drains. In a microbenchmark, a tensor_load
+  issued right after k prefetch chunks started about k - 27 cycles late, i.e. one cycle per chunk.
+  The 27 chunks that caused no delay there are not credited here; they stay inside the margin.
+- `M = 75` cycles: a fixed margin. Placing the prefetches exactly at the drain time still left some
+  kernels slightly slower (up to about 0.6%); with this margin all 13 measured MAF kernels were at
+  least as fast as the constant lead, within 0.5% noise. It is a measured setting, not derived.
+- The scheduler spreads the prefetches over the lead (the j-th at `lead * (n - j) / n`), so the
+  prefetches from j on get only part of it; each such suffix must drain in its share. With the
+  largest prefetches first, the whole group (j = 0) sets the lead.
+
+Example: 128 + 128 + 16 + 16 = 288 chunks give 288 + 75 = 363 cycles; with 8-cycle WMMAs the lead
+is ceil(363 / 8) - 2 = 44 WMMAs.
+
+What the model does not cover:
+
+- A lead that is too far. A prefetch early in its stage costs (see above), and measured MAF
+  kernels lose again past a lead of about 56 to 70 windows at 128 WMMAs per stage. There is no
+  model for that side, so the lead has no upper bound other than the address chain: a prefetch
+  is never issued before its address is ready.
+- Stage-end ds_load effects, and single-stage loops (no HalfPLR, which keep `PrefetchLeadWmmas`).
+
 ## Open
 
-- The lead per loop shape (25/40, single-stage grouping) is a measured default, not a
-  derivation; a prefetch-distance sweep per kernel family is the next step.
+- An upper bound for the lead (the far side above) and an address-chain cap in the scheduler.
+- The `- 2` windows (`kLeadPlacementWindows`) correct for the placement, not the model: the lead
+  is counted from the stage barrier's planned window, and the first prefetch lands about 2
+  windows further from the tensor_load. Counting from the tensor_load's own window would remove
+  the correction.

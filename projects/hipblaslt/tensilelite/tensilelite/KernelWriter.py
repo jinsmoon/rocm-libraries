@@ -7810,6 +7810,12 @@ class KernelWriter(PersistentKernelState, StreamKKernelState, metaclass=abc.ABCM
       stinky_module_options["PrefetchLeadWmmas"] = \
         4 if not kernel["HalfPLR"] else \
         25 if kernel["ProblemType"]["DataTypeA"].numBytes() < 1 else 30
+      # With HalfPLR the lead comes from the time the prefetch group's GL2 chunks need to drain
+      # (GL2PrefetchLoad.leadCycles; stinkytofu turns the cycles into WMMAs of the loop). 0 keeps
+      # the constant lead above.
+      stinky_module_options["PrefetchLeadCycles"] = \
+        self.gl2PrefetchLeadCycles(kernel, tensorParametersA, tensorParametersB) \
+        if kernel["HalfPLR"] and kernel["PrefetchGL2"] else 0
       if self.states.localReadSideOrder[0] == "B":
         stinky_module_options["DsReadOrder"] = 0  # Preserve selected B-then-A emission.
       # Tuning overrides from GlobalParameters win over the values above.
@@ -13084,6 +13090,10 @@ class KernelWriter(PersistentKernelState, StreamKKernelState, metaclass=abc.ABCM
   @abc.abstractmethod
   def gl2PrefetchIssueLoad(self, kernel, tPA, tPB) -> Module:
     return ""
+
+  @abc.abstractmethod
+  def gl2PrefetchLeadCycles(self, kernel, tPA, tPB) -> int:
+    return 0
   
   @abc.abstractmethod
   def gl2PrefetchClearIncrement(self, kernel, tPA, tPB) -> Module:

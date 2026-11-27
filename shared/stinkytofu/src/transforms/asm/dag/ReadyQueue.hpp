@@ -22,6 +22,7 @@
  * ************************************************************************ */
 #pragma once
 
+#include <algorithm>
 #include <climits>
 #include <cmath>
 #include <iostream>  // TODO: don't use iostream.
@@ -50,21 +51,39 @@ struct RegionDAG;
 // prefetch lead, so the block runs as if PrefetchLeadWmmas = 0. A single-stage lead only
 // groups the prefetches in the tensor_load's window and needs no room, so a short stage keeps
 // it. Blocks without WMMAs or tensor_loads keep any lead.
+//
+// A lead given in cycles (PrefetchLeadCycles) becomes windows of the block's first WMMA
+// (its latency after the operand-format override), minus kLeadPlacementWindows, at least
+// kSingleStageLeadBelow. A block without WMMAs keeps the lead in windows.
 struct StageWmmaCounter {
     // A lead below this marks a single-stage loop body (tensilelite: no HalfPLR).
     static constexpr int kSingleStageLeadBelow = 8;
+    // The first prefetch of a group lands about this many windows beyond its lead: the
+    // tensor_load issues after the stage barrier whose planned window stands in for it.
+    // NOTE: this is a correction for that mismatch between the lead the placement is given and
+    // where the prefetch actually lands, not part of the lead model. The value is measured
+    // (+2.0 to +2.8 windows on the gfx1250 MAF kernels). If the placement measures the lead from
+    // the tensor_load's own window, this should become 0.
+    static constexpr int kLeadPlacementWindows = 2;
     int wmmas = 0;
     int groups = 0;
+    int wmmaCycles = 0;
     bool wmmaSinceTensorLoad = true;
     void add(const StinkyInstruction& inst) {
         if (inst.getHwInstDesc() == nullptr) return;
         if (isMatrixInstruction(inst)) {
+            if (wmmas == 0) wmmaCycles = inst.latencyCycles;
             ++wmmas;
             wmmaSinceTensorLoad = true;
         } else if (isTensorLoad(inst)) {
             if (wmmaSinceTensorLoad) ++groups;
             wmmaSinceTensorLoad = false;
         }
+    }
+    int requestedLead(int leadWmmas, int leadCycles) const {
+        if (leadCycles <= 0 || wmmaCycles <= 0) return leadWmmas;
+        const int windows = (leadCycles + wmmaCycles - 1) / wmmaCycles - kLeadPlacementWindows;
+        return std::max(windows, kSingleStageLeadBelow);
     }
     int effectiveLead(int lead, int minStageWmmas) const {
         const bool shortStage = groups > 0 && wmmas > 0 && wmmas < minStageWmmas * groups;

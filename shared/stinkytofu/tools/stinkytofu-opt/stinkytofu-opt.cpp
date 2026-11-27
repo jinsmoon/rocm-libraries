@@ -217,6 +217,7 @@ std::vector<RequestedPass> parsePassNames(int argc, char** argv, int startIdx) {
                 arg == "--enable-esm2-track-valu-vsrc" ||
                 arg.starts_with("--wait-alu-hold-strict-count=") ||
                 arg == "--wait-alu-scoreboard" || arg.starts_with("--prefetch-lead-wmmas=") ||
+                arg.starts_with("--prefetch-lead-cycles=") ||
                 arg.starts_with("--prefetch-lead-min-stage-wmmas=") ||
                 arg.starts_with("--war-gate-wmmas=") || arg == "--ds-slot-first" ||
                 arg.starts_with("--vgpr-msb-mode=") || arg == "--from-label" ||
@@ -689,6 +690,8 @@ int main(int argc, char** argv) {
             passFeatureConfig.dagFeatures.waitAluScoreboard = true;
         } else if (a.starts_with("--prefetch-lead-wmmas=")) {
             passFeatureConfig.dagFeatures.prefetchLeadWmmas = std::stoi(a.substr(22));
+        } else if (a.starts_with("--prefetch-lead-cycles=")) {
+            passFeatureConfig.dagFeatures.prefetchLeadCycles = std::stoi(a.substr(23));
         } else if (a.starts_with("--prefetch-lead-min-stage-wmmas=")) {
             passFeatureConfig.dagFeatures.prefetchLeadMinStageWmmas = std::stoi(a.substr(32));
         } else if (a.starts_with("--war-gate-wmmas=")) {

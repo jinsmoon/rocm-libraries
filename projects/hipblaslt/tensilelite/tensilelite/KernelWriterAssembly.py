@@ -27515,6 +27515,10 @@ class KernelWriterAssembly(KernelWriter):
       mod.add(comp.issueLoad(self, kernel, tp))
     return mod
   
+  def gl2PrefetchLeadCycles(self, kernel, tPA, tPB) -> int:
+    """Cycles the prefetches in front of one tensor_load need ahead of it (PrefetchLeadCycles)."""
+    return GL2PrefetchLoad.leadCycles(kernel, self.gl2PrefetchTpList(kernel, tPA, tPB))
+
   def gl2PrefetchClearIncrement(self, kernel, tPA, tPB) -> Module:
     mod = Module("GL2 Prefetch Clear Increment")
     comp = GL2PrefetchLoad.find(self)
